@@ -10,11 +10,9 @@ def is_installed(package):
         return True
     return False
 
-
 class Fuzzer :
-    deploy_string = []
-    
-    def __init__(self, fuzzer, testing_dir=None, findings_dir=None, binary=None, config=None, profile=None):   
+    def __init__(self, fuzzer, testing_dir=None, findings_dir=None, binary=None, config=None, profile=None):
+        self.deploy_string = []
         self.set_fuzzer(fuzzer)
         self.set_testing_dir(testing_dir)
         self.set_findings_dir(findings_dir)
@@ -81,30 +79,36 @@ class Fuzzer :
     def set_args(self, args, params=None):
         if args not in self.config["parameters"]:
             raise ValueError("Argument not availabe")
-        Fuzzer.deploy_string.insert(-1, "-" + self.config["parameters"][args])
-        if params:
-            Fuzzer.deploy_string.insert(-1, params)
-        
+        if (isinstance(self.deploy_string[0] , list)):
+            for each in self.deploy_string :
+                each.insert(-1, "-" + self.config["parameters"][args])
+                if params:
+                    each.insert(-1, params)
+        else : 
+            self.deploy_string.insert(-1, "-" + self.config["parameters"][args])
+            if params:
+                self.deploy_string.insert(-1, params)
+    
     def build_deploy(self) :
-        Fuzzer.deploy_string.append(self.config["execute"])
-        Fuzzer.deploy_string.append(self.binary)
+        self.deploy_string.append(self.config["execute"])
+        self.deploy_string.append(self.binary)
         self.set_args("input", self.testing_dir)
         self.set_args("output", self.findings_dir)
     
     def build_profile(self):
         if self.fuzzer == "afl-fuzz" :
-            #Need to fix core distribution logic.
+            #Hacky fix
             builder = []
-            temp = Fuzzer.deploy_string
             for core in range(int(self.profile["core"])):
-                print(temp)
+                temp = self.deploy_string.copy()
                 if core == 0:
-                    self.set_args("master", "fuzzer-master")
+                    temp.insert(-1,"-M")
+                    temp.insert(-1,"fuzzer-master")
                 else :
-                    self.set_args("slave", "fuzzer" + str(core).zfill(2))
-                builder.append(Fuzzer.deploy_string)
-                Fuzzer.deploy_string = temp
-            Fuzzer.deploy_string = builder
+                    temp.insert(-1,"-S")
+                    temp.insert(-1,"fuzzer" + str(core).zfill(2))
+                builder.append(temp)
+            self.deploy_string = builder[:]
             self.set_args("memory", self.profile["memory"])
             self.set_args("timeout", self.profile["timeout"])
         if self.fuzzer == "shellphuzz" :

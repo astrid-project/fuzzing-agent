@@ -1,2 +1,5 @@
 fuzzing-agent.code-workspace
 dummy/
+test/
+__pycache__/
+demos/

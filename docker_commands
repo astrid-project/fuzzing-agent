@@ -1,0 +1,21 @@
+docker pull docker
+docker pull docker:dind
+docker network create para-docker-network
+docker volume create para-docker-certs-ca
+docker volume create para-docker-certs-client
+
+docker run --privileged --name para-docker -d \
+    --network para-docker-network --network-alias docker \
+    -e DOCKER_TLS_CERTDIR=/certs \
+    -v para-docker-certs-ca:/certs/ca \
+    -v para-docker-certs-client:/certs/client \
+    docker:dind 
+
+docker run -it --rm --network para-docker-network \
+    -e DOCKER_TLS_CERTDIR=/certs \
+    -v para-docker-certs-client:/certs/client:ro \
+    docker:latest sh
+
+docker run -it  moflow/afl-fuzz bash
+
+# Need to add python install and pip install of extensions for agent

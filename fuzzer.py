@@ -43,13 +43,26 @@ class Fuzzer :
             self.queuedir = path.join(self.findings_dir, path.basename(self.binary), self.config["queuedir"])
             
     def set_testing_dir(self, testing_dir):
-        if path.exists(path.abspath(testing_dir)):
+        safe_testing_dir = "./test/testcases"
+        if not testing_dir:
+            if not path.exists(safe_testing_dir) :
+                os.makedirs(safe_testing_dir)
+            self.testing_dir = path.abspath(safe_testing_dir)
+            f = open(safe_testing_dir + "/1.txt", "w")
+            f.write("Hope this works")
+            f.close()
+        elif path.exists(path.abspath(testing_dir)):
             self.testing_dir = path.abspath(testing_dir)
         else:
             raise OSError("Input directory doesn't exist")
     
     def set_findings_dir(self, findings_dir):
-        if path.exists(path.abspath(findings_dir)):
+        safe_findings_dir = "./test/findings"
+        if not findings_dir :
+            if not path.exists(safe_findings_dir) :
+                os.makedirs(safe_findings_dir)
+            self.findings_dir = path.abspath(safe_findings_dir)
+        elif path.exists(path.abspath(findings_dir)):
             self.findings_dir = path.abspath(findings_dir)
         else:
             raise OSError("Output directory doesn't exist") 
@@ -117,8 +130,7 @@ class Fuzzer :
             self.set_args("memory", self.profile["memory"])
             self.set_args("timeout", self.profile["timeout"])
 
-
-        
-
-fuzz = Fuzzer("AFL", "./dummy/in" , "./dummy/out", "./dummy/precimon_collector",'', '')
-fuzz = Fuzzer("driller", "./dummy/in" , "./dummy/out", "./dummy/precimon_collector",'', '')
+#fuzz = Fuzzer("AFL", "./demos/afl-demo/testcases" , "./demos/afl-demo/findings", "./demos/afl-demo/aflbuild/afldemo",'', '')
+#fuzz = Fuzzer("AFL", "" , "", "./demos/afl-demo/aflbuild/afldemo",'', '')
+#fuzz = Fuzzer("AFL", "" , "", "./demos/afl-demo/aflbuild/afldemo",'', 'relaxed')
+#print(fuzz.deploy_string)

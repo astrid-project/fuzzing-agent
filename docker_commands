@@ -1,4 +1,6 @@
 docker pull docker
+
+
 docker pull docker:dind
 docker network create para-docker-network
 docker volume create para-docker-certs-ca

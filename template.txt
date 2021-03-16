@@ -1,0 +1,394 @@
+# Deploy String
+[
+   [
+      "afl-fuzz",
+      "-i",
+      "/home/venky/Desktop/fuzzing/fuzzing-agent/test/testcases",
+      "-o",
+      "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings",
+      "-M",
+      "fuzzer-master",
+      "-m",
+      "1G",
+      "-t",
+      "500ms",
+      "/home/venky/Desktop/fuzzing/fuzzing-agent/demos/afl-demo/aflbuild/afldemo"
+   ],
+   [
+      "afl-fuzz",
+      "-i",
+      "/home/venky/Desktop/fuzzing/fuzzing-agent/test/testcases",
+      "-o",
+      "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings",
+      "-S",
+      "fuzzer01",
+      "-m",
+      "1G",
+      "-t",
+      "500ms",
+      "/home/venky/Desktop/fuzzing/fuzzing-agent/demos/afl-demo/aflbuild/afldemo"
+   ],
+   [
+      "afl-fuzz",
+      "-i",
+      "/home/venky/Desktop/fuzzing/fuzzing-agent/test/testcases",
+      "-o",
+      "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings",
+      "-S",
+      "fuzzer02",
+      "-m",
+      "1G",
+      "-t",
+      "500ms",
+      "/home/venky/Desktop/fuzzing/fuzzing-agent/demos/afl-demo/aflbuild/afldemo"
+   ],
+   [
+      "afl-fuzz",
+      "-i",
+      "/home/venky/Desktop/fuzzing/fuzzing-agent/test/testcases",
+      "-o",
+      "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings",
+      "-S",
+      "fuzzer03",
+      "-m",
+      "1G",
+      "-t",
+      "500ms",
+      "/home/venky/Desktop/fuzzing/fuzzing-agent/demos/afl-demo/aflbuild/afldemo"
+   ]
+]
+
+# Report
+
+[
+   {
+      "afl_banner":"fuzzer-master",
+      "afl_version":"2.57b",
+      "bitmap_cvg":"7.39%",
+      "command_line":" afl-fuzz -i /home/venky/Desktop/fuzzing/fuzzing-agent/test/testcases -o /home/venky/Desktop/fuzzing/fuzzing-agent/test/findings -M fuzzer-master -m 1G -t 500ms /home/venky/Desktop/fuzzing/fuzzing-agent/demos/afl-demo/aflbuild/afldemo\n",
+      "cur_path":"70",
+      "cycles_done":"0",
+      "exec_timeout":"500",
+      "execs_done":"609530",
+      "execs_per_sec":"5833.17",
+      "execs_since_crash":"9716",
+      "fuzzer_pid":"3813400",
+      "last_crash":"2021-02-22 20:42:57",
+      "last_hang":"0",
+      "last_path":"2021-02-22 20:42:57",
+      "last_update":"2021-02-22 20:42:59",
+      "max_depth":"2",
+      "paths_favored":"634",
+      "paths_found":"214",
+      "paths_imported":"458",
+      "paths_total":"673",
+      "peak_rss_mb":"notavailablewhileaflisrunning",
+      "pending_favs":"600",
+      "pending_total":"637",
+      "slowest_exec_ms":"500",
+      "stability":"100.00%",
+      "start_time":"2021-02-22 20:39:17",
+      "target_mode":"default",
+      "unique_crashes":"1585",
+      "unique_hangs":"0",
+      "variable_paths":"0"
+   },
+   {
+      "afl_banner":"fuzzer01",
+      "afl_version":"2.57b",
+      "bitmap_cvg":"12.58%",
+      "command_line":" afl-fuzz -i /home/venky/Desktop/fuzzing/fuzzing-agent/test/testcases -o /home/venky/Desktop/fuzzing/fuzzing-agent/test/findings -S fuzzer01 -m 1G -t 500ms /home/venky/Desktop/fuzzing/fuzzing-agent/demos/afl-demo/aflbuild/afldemo\n",
+      "cur_path":"271",
+      "cycles_done":"1",
+      "exec_timeout":"500",
+      "execs_done":"590536",
+      "execs_per_sec":"5641.13",
+      "execs_since_crash":"29",
+      "fuzzer_pid":"3813401",
+      "last_crash":"2021-02-22 20:42:59",
+      "last_hang":"0",
+      "last_path":"2021-02-22 20:42:58",
+      "last_update":"2021-02-22 20:42:59",
+      "max_depth":"4",
+      "paths_favored":"1147",
+      "paths_found":"1008",
+      "paths_imported":"187",
+      "paths_total":"1196",
+      "peak_rss_mb":"notavailablewhileaflisrunning",
+      "pending_favs":"914",
+      "pending_total":"955",
+      "slowest_exec_ms":"1",
+      "stability":"100.00%",
+      "start_time":"2021-02-22 20:39:17",
+      "target_mode":"default",
+      "unique_crashes":"4992",
+      "unique_hangs":"0",
+      "variable_paths":"0"
+   },
+   {
+      "afl_banner":"fuzzer02",
+      "afl_version":"2.57b",
+      "bitmap_cvg":"12.29%",
+      "command_line":" afl-fuzz -i /home/venky/Desktop/fuzzing/fuzzing-agent/test/testcases -o /home/venky/Desktop/fuzzing/fuzzing-agent/test/findings -S fuzzer02 -m 1G -t 500ms /home/venky/Desktop/fuzzing/fuzzing-agent/demos/afl-demo/aflbuild/afldemo\n",
+      "cur_path":"363",
+      "cycles_done":"0",
+      "exec_timeout":"500",
+      "execs_done":"509026",
+      "execs_per_sec":"4852.77",
+      "execs_since_crash":"74",
+      "fuzzer_pid":"3813402",
+      "last_crash":"2021-02-22 20:42:59",
+      "last_hang":"0",
+      "last_path":"2021-02-22 20:42:59",
+      "last_update":"2021-02-22 20:42:59",
+      "max_depth":"4",
+      "paths_favored":"1107",
+      "paths_found":"985",
+      "paths_imported":"266",
+      "paths_total":"1252",
+      "peak_rss_mb":"notavailablewhileaflisrunning",
+      "pending_favs":"837",
+      "pending_total":"950",
+      "slowest_exec_ms":"500",
+      "stability":"100.00%",
+      "start_time":"2021-02-22 20:39:17",
+      "target_mode":"default",
+      "unique_crashes":"2515",
+      "unique_hangs":"0",
+      "variable_paths":"0"
+   },
+   {
+      "afl_banner":"fuzzer03",
+      "afl_version":"2.57b",
+      "bitmap_cvg":"12.46%",
+      "command_line":" afl-fuzz -i /home/venky/Desktop/fuzzing/fuzzing-agent/test/testcases -o /home/venky/Desktop/fuzzing/fuzzing-agent/test/findings -S fuzzer03 -m 1G -t 500ms /home/venky/Desktop/fuzzing/fuzzing-agent/demos/afl-demo/aflbuild/afldemo\n",
+      "cur_path":"378",
+      "cycles_done":"0",
+      "exec_timeout":"500",
+      "execs_done":"588191",
+      "execs_per_sec":"5618.07",
+      "execs_since_crash":"268",
+      "fuzzer_pid":"3813403",
+      "last_crash":"2021-02-22 20:42:59",
+      "last_hang":"0",
+      "last_path":"2021-02-22 20:42:59",
+      "last_update":"2021-02-22 20:42:59",
+      "max_depth":"6",
+      "paths_favored":"1114",
+      "paths_found":"989",
+      "paths_imported":"177",
+      "paths_total":"1167",
+      "peak_rss_mb":"notavailablewhileaflisrunning",
+      "pending_favs":"775",
+      "pending_total":"819",
+      "slowest_exec_ms":"500",
+      "stability":"100.00%",
+      "start_time":"2021-02-22 20:39:17",
+      "target_mode":"default",
+      "unique_crashes":"3851",
+      "unique_hangs":"0",
+      "variable_paths":"0"
+   }
+]
+
+# Compressed Report
+
+[
+   {
+      "execs_done":"609530",
+      "execs_per_sec":"5833.17",
+      "last_crash":"2021-02-22 20:42:57",
+      "last_path":"2021-02-22 20:42:57",
+      "last_update":"2021-02-22 20:42:59",
+      "paths_favored":"634",
+      "paths_total":"673",
+      "start_time":"2021-02-22 20:39:17",
+      "unique_crashes":"1585",
+      "unique_hangs":"0"
+   },
+   {
+      "execs_done":"590536",
+      "execs_per_sec":"5641.13",
+      "last_crash":"2021-02-22 20:42:59",
+      "last_path":"2021-02-22 20:42:58",
+      "last_update":"2021-02-22 20:42:59",
+      "paths_favored":"1147",
+      "paths_total":"1196",
+      "start_time":"2021-02-22 20:39:17",
+      "unique_crashes":"4992",
+      "unique_hangs":"0"
+   },
+   {
+      "execs_done":"509026",
+      "execs_per_sec":"4852.77",
+      "last_crash":"2021-02-22 20:42:59",
+      "last_path":"2021-02-22 20:42:59",
+      "last_update":"2021-02-22 20:42:59",
+      "paths_favored":"1107",
+      "paths_total":"1252",
+      "start_time":"2021-02-22 20:39:17",
+      "unique_crashes":"2515",
+      "unique_hangs":"0"
+   },
+   {
+      "execs_done":"588191",
+      "execs_per_sec":"5618.07",
+      "last_crash":"2021-02-22 20:42:59",
+      "last_path":"2021-02-22 20:42:59",
+      "last_update":"2021-02-22 20:42:59",
+      "paths_favored":"1114",
+      "paths_total":"1167",
+      "start_time":"2021-02-22 20:39:17",
+      "unique_crashes":"3851",
+      "unique_hangs":"0"
+   }
+]
+
+
+# Queues
+[   
+    [
+        {
+            "grammar": "src:000333,op:havoc,rep:2,+cov",
+            "id": "910",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/queue/id:000910,src:000333,op:havoc,rep:2,+cov",
+            "size": 108
+        },
+        {
+            "grammar": "sync:fuzzer02,src:000042,+cov",
+            "id": "103",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/queue/id:000103,sync:fuzzer02,src:000042,+cov",
+            "size": 105
+        },
+        {
+            "grammar": "src:000241,op:havoc,rep:2,+cov",
+            "id": "361",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/queue/id:000361,src:000241,op:havoc,rep:2,+cov",
+            "size": 108
+        },
+        {
+            "grammar": "src:000287,op:havoc,rep:2,+cov",
+            "id": "493",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/queue/id:000493,src:000287,op:havoc,rep:2,+cov",
+            "size": 106
+        },
+        {
+            "grammar": "src:000375+000668,op:splice,rep:2,+cov",
+            "id": "1132",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/queue/id:001132,src:000375+000668,op:splice,rep:2,+cov",
+            "size": 108
+        },
+        {
+            "grammar": "src:000365,op:havoc,rep:8,+cov",
+            "id": "1076",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/queue/id:001076,src:000365,op:havoc,rep:8,+cov",
+            "size": 108
+        },
+        {
+            "grammar": "src:000037,op:havoc,rep:8,+cov",
+            "id": "62",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/queue/id:000062,src:000037,op:havoc,rep:8,+cov",
+            "size": 105
+        },
+        {
+            "grammar": "src:000317,op:havoc,rep:4,+cov",
+            "id": "760",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/queue/id:000760,src:000317,op:havoc,rep:4,+cov",
+            "size": 108
+        },
+        {
+            "grammar": "src:000291+000411,op:splice,rep:4,+cov",
+            "id": "584",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/queue/id:000584,src:000291+000411,op:splice,rep:4,+cov",
+            "size": 109
+        },
+        {
+            "grammar": "src:000365,op:havoc,rep:4,+cov",
+            "id": "1083",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/queue/id:001083,src:000365,op:havoc,rep:4,+cov",
+            "size": 108
+        }
+    ]
+]
+
+
+# Crashes
+[   
+    [
+        {
+            "grammar": "sig:11,src:000327,op:havoc,rep:16",
+            "id": "2951",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/crashes/id:002951,sig:11,src:000327,op:havoc,rep:16",
+            "size": 131
+        },
+        {
+            "grammar": "sig:11,src:000327,op:havoc,rep:8",
+            "id": "2950",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/crashes/id:002950,sig:11,src:000327,op:havoc,rep:8",
+            "size": 138
+        },
+        {
+            "grammar": "sig:11,src:000144,op:havoc,rep:16",
+            "id": "1108",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/crashes/id:001108,sig:11,src:000144,op:havoc,rep:16",
+            "size": 106
+        },
+        {
+            "grammar": "sig:11,sync:fuzzer02,src:000372",
+            "id": "968",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/crashes/id:000968,sig:11,sync:fuzzer02,src:000372",
+            "size": 106
+        },
+        {
+            "grammar": "sig:11,src:000289,op:havoc,rep:16",
+            "id": "2194",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/crashes/id:002194,sig:11,src:000289,op:havoc,rep:16",
+            "size": 185
+        },
+        {
+            "grammar": "sig:11,src:000364,op:havoc,rep:4",
+            "id": "3595",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/crashes/id:003595,sig:11,src:000364,op:havoc,rep:4",
+            "size": 127
+        },
+        {
+            "grammar": "sig:11,src:000326+000418,op:splice,rep:2",
+            "id": "2931",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/crashes/id:002931,sig:11,src:000326+000418,op:splice,rep:2",
+            "size": 108
+        },
+        {
+            "grammar": "sig:11,src:000331,op:havoc,rep:32",
+            "id": "3050",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/crashes/id:003050,sig:11,src:000331,op:havoc,rep:32",
+            "size": 137
+        },
+        {
+            "grammar": "sig:11,src:000176,op:havoc,rep:32",
+            "id": "1285",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/crashes/id:001285,sig:11,src:000176,op:havoc,rep:32",
+            "size": 192
+        },
+        {
+            "grammar": "sig:11,src:000052,op:havoc,rep:8",
+            "id": "341",
+            "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/findings/fuzzer03/crashes/id:000341,sig:11,src:000052,op:havoc,rep:8",
+            "size": 119
+        },
+    ]
+]
+
+
+# Inputs
+[
+    {
+        "content": "Hope this works",
+        "name": "1.txt",
+        "path": "/home/venky/Desktop/fuzzing/fuzzing-agent/test/testcases/1.txt",
+        "size": 15
+    }
+]
+
+
+# Kill Stop resume
+signal.SIGKILL , signal.SIGSTOP, signal.SIGCONT

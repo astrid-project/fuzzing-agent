@@ -45,6 +45,20 @@ def add_testcase(testcase) :
     f.write(testcase)
     f.close()
 
+def push_testcase(fuzzer):
+    path = fuzz_instance.testing_dir
+    testcases = []
+    if os.path.exists(path) :
+        filedir_list = os.listdir(path)
+        for each in filedir_list :
+            dir_testcase = {}
+            dir_testcase["name"] = each
+            dir_testcase["path"] = path + "/" + each
+            dir_testcase["size"] = os.path.getsize(dir_testcase["path"])
+            f = open(dir_testcase["path"], "r")
+            dir_testcase["content"] = f.read()
+            testcases.append(dir_testcase)
+    return json.dumps(testcases, indent=4, sort_keys=True)
 '''
     Provides a json formatted output of fuzzing stats of all the fuzzers deployed. Detailed
 '''
@@ -161,9 +175,10 @@ def push_queue(ip, topic):
         for id, value in enumerate(old_data):
             diff = [i for i in new_data[id] + value if i not in new_data[id] or i not in value]
         data = json.dumps(diff, indent=4, sort_keys=True)
-    if data :
-        producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
-        producer.send(topic, value=data)
+    print(data)
+    #if data :
+    #    producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
+    #    producer.send(topic, value=data)
 
 def push_crashes(ip, topic):
     global crash_list, fuzz_instance
@@ -176,9 +191,10 @@ def push_crashes(ip, topic):
         for id, value in enumerate(old_data):
             diff = [i for i in new_data[id] + value if i not in new_data[id] or i not in value]
         data = json.dumps(diff, indent=4, sort_keys=True)
-    if data :
-        producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
-        producer.send(topic, value=data)
+    print(data)
+    #if data :
+    #    producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
+    #    producer.send(topic, value=data)
 
 
 
@@ -211,5 +227,5 @@ TODO :
     # Interface to call the kafka production 
     # How to integrate the test cases ?
 '''
-deploy_string("AFL", "" , "", "./demos/afl-demo/aflbuild/afldemo",'', 'relaxed')
+print(deploy_string("AFL", "" , "", "./demos/afl-demo/aflbuild/afldemo",'', 'relaxed'))
 

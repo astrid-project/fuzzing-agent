@@ -11,6 +11,8 @@ import json
 import warnings
 import datetime
 import signal
+import argparse
+
 
 '''
 Fuzzer instance class
@@ -45,20 +47,6 @@ def add_testcase(testcase) :
     f.write(testcase)
     f.close()
 
-def push_testcase(fuzzer):
-    path = fuzz_instance.testing_dir
-    testcases = []
-    if os.path.exists(path) :
-        filedir_list = os.listdir(path)
-        for each in filedir_list :
-            dir_testcase = {}
-            dir_testcase["name"] = each
-            dir_testcase["path"] = path + "/" + each
-            dir_testcase["size"] = os.path.getsize(dir_testcase["path"])
-            f = open(dir_testcase["path"], "r")
-            dir_testcase["content"] = f.read()
-            testcases.append(dir_testcase)
-    return json.dumps(testcases, indent=4, sort_keys=True)
 '''
     Provides a json formatted output of fuzzing stats of all the fuzzers deployed. Detailed
 '''
@@ -149,7 +137,6 @@ def resume(fuzzer):
         pid = int(each["fuzzer_pid"])
         os.kill(pid, signal.SIGCONT)
 
-
 def push_report(ip, topic):
     global fuzz_instance
     producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
@@ -196,36 +183,54 @@ def push_crashes(ip, topic):
     #    producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
     #    producer.send(topic, value=data)
 
+def push_testcase(ip, topic):
+    global fuzz_instance
+    path = fuzz_instance.testing_dir
+    testcases = []
+    data = ""
+    if os.path.exists(path) :
+        filedir_list = os.listdir(path)
+        for each in filedir_list :
+            dir_testcase = {}
+            dir_testcase["name"] = each
+            dir_testcase["path"] = path + "/" + each
+            dir_testcase["size"] = os.path.getsize(dir_testcase["path"])
+            f = open(dir_testcase["path"], "r")
+            dir_testcase["content"] = f.read()
+            testcases.append(dir_testcase)
+        data = json.dumps(testcases, indent=4, sort_keys=True)
+    if data :
+        producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
+        producer.send(topic, value=data)
 
 
 '''
-app = Flask(__name__)
-app.config["DEBUG"] = True
-
-@app.route('/deploy', methods=['GET', 'POST'])
-def home():
-    if request.method == 'POST' :
-        fuzz = request.form.get("fuzzer")
-        testing_dir = request.form.get("testing_dir")
-        findings_dir = request.form.get("findings_dir")
-        config = request.form.get("config_path")
-        profile =  request.form.get("profile")
-        fuzz_instance = Fuzzer(fuzz, testing_dir, findings_dir, config_path, profile)
-        return jsonify(fuzz_instance.deploy_string)
-
-app.run()
-
-def testPush(fuzzer) :
-    global fuzz_instance
-    while True :
-        data = stats(fuzz_instance, "")
-        print(data)
-        sleep(10)
-
 TODO : 
     # How to call these functions ?
     # Interface to call the kafka production 
     # How to integrate the test cases ?
 '''
-print(deploy_string("AFL", "" , "", "./demos/afl-demo/aflbuild/afldemo",'', 'relaxed'))
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Fuzzing agent for ASTRID")
+    parser.add_argument('--fuzzer', help='Fuzzer to be used for fuzzing (AFL/driller)')
+    parser.add_argument('--input', help='Testcases directory for input')
+    parser.add_argument('--output', help='Working output directory for input')
+    parser.add_argument('--binary', help='The binary to be used for fuzzing')
+    parser.add_argument('--config', help='Path to the configuration file')
+    parser.add_argument('--profile', help='Execution profile for the agent')
+    parser.add_argument('--ip', help='IP for the Kafka bus')
+    parser.add_argument('--topic', help='Topic for the kafka bus')
+    args = parser.parse_args()
+    
+    #fuzz = Fuzzer("AFL", "./demos/afl-demo/testcases" , "./demos/afl-demo/findings", "./demos/afl-demo/aflbuild/afldemo",'', '')
+    deploy_string(args.fuzzer, args.input, args.output, args.binary, args.config, args.profile)
+    deploy(fuzz_instance)
+    ip = args.ip
+    topic = args.topic
+    while True:
+        push_report(ip, topic)
+        push_compressed_report(ip, topic)
+        push_queue(ip, topic)
+        push_crashes(ip, topic)
+        push_testcase(ip, topic)

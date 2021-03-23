@@ -199,9 +199,10 @@ def push_testcase(ip, topic):
             dir_testcase["content"] = f.read()
             testcases.append(dir_testcase)
         data = json.dumps(testcases, indent=4, sort_keys=True)
-    if data :
-        producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
-        producer.send(topic, value=data)
+    print(data)
+    #if data :
+    #    producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
+    #    producer.send(topic, value=data)
 
 
 '''
@@ -213,24 +214,25 @@ TODO :
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fuzzing agent for ASTRID")
-    parser.add_argument('--fuzzer', help='Fuzzer to be used for fuzzing (AFL/driller)')
-    parser.add_argument('--input', help='Testcases directory for input')
-    parser.add_argument('--output', help='Working output directory for input')
-    parser.add_argument('--binary', help='The binary to be used for fuzzing')
-    parser.add_argument('--config', help='Path to the configuration file')
-    parser.add_argument('--profile', help='Execution profile for the agent')
-    parser.add_argument('--ip', help='IP for the Kafka bus')
-    parser.add_argument('--topic', help='Topic for the kafka bus')
+    parser.add_argument('--fuzzer', '-f', help='Fuzzer to be used for fuzzing (AFL/driller)', required=True)
+    parser.add_argument('--input', '-i', help='Testcases directory for input')
+    parser.add_argument('--output', '-o', help='Working output directory for input')
+    parser.add_argument('--binary', '-b', help='The binary to be used for fuzzing', required=True)
+    parser.add_argument('--config', '-c' ,help='Path to the configuration file')
+    parser.add_argument('--profile', '-p',help='Execution profile for the agent', required=True)
+    parser.add_argument('--ip', help='IP for the Kafka bus', required=True)
+    parser.add_argument('-topics','-t', nargs='+', help='Topics for the kafka bus [report, comp_report, queue, crash, testcase]', required=True)
     args = parser.parse_args()
     
     #fuzz = Fuzzer("AFL", "./demos/afl-demo/testcases" , "./demos/afl-demo/findings", "./demos/afl-demo/aflbuild/afldemo",'', '')
     deploy_string(args.fuzzer, args.input, args.output, args.binary, args.config, args.profile)
     deploy(fuzz_instance)
     ip = args.ip
-    topic = args.topic
+    topic = args.topics
     while True:
-        push_report(ip, topic)
-        push_compressed_report(ip, topic)
-        push_queue(ip, topic)
-        push_crashes(ip, topic)
-        push_testcase(ip, topic)
+        push_report(ip, topic[0])
+        push_compressed_report(ip, topic[1])
+        push_queue(ip, topic[2])
+        push_crashes(ip, topic[3])
+        push_testcase(ip, topic[4])
+        sleep(10)

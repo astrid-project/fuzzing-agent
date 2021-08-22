@@ -4,6 +4,9 @@ import subprocess
 import json
 import warnings
 
+with open('config/agent.cfg', "r") as config_file:
+    config_data = json.load(config_file)
+
 def is_installed(package):
     retval = subprocess.call(["which", package])
     if retval == 0:
@@ -43,12 +46,12 @@ class Fuzzer :
             self.queuedir = path.join(self.findings_dir, path.basename(self.binary), self.config["queuedir"])
             
     def set_testing_dir(self, testing_dir):
-        safe_testing_dir = "./test/testcases"
+        safe_testing_dir = config_data["paths"]["testing"]
         if not testing_dir:
             if not path.exists(safe_testing_dir) :
                 os.makedirs(safe_testing_dir)
             self.testing_dir = path.abspath(safe_testing_dir)
-            f = open(safe_testing_dir + "/1.txt", "w")
+            f = open(safe_testing_dir + "/1", "w")
             f.write("Hope this works")
             f.close()
         elif path.exists(path.abspath(testing_dir)):
@@ -57,7 +60,7 @@ class Fuzzer :
             raise OSError("Input directory doesn't exist")
     
     def set_findings_dir(self, findings_dir):
-        safe_findings_dir = "./test/findings"
+        safe_findings_dir = config_data["paths"]["finding"]
         if not findings_dir :
             if not path.exists(safe_findings_dir) :
                 os.makedirs(safe_findings_dir)
@@ -75,7 +78,7 @@ class Fuzzer :
     
     def set_config(self, config, fuzzer):
         if not config or config:
-            config = "fuzzing.cfg"
+            config = config_data["paths"]["config"]
         if path.exists(path.abspath(config)):
             with open(path.abspath(config)) as json_file:
                 config_json = json.load(json_file)
@@ -131,6 +134,6 @@ class Fuzzer :
             self.set_args("timeout", self.profile["timeout"])
 
 #fuzz = Fuzzer("AFL", "./demos/afl-demo/testcases" , "./demos/afl-demo/findings", "./demos/afl-demo/aflbuild/afldemo",'', '')
-#fuzz = Fuzzer("AFL", "" , "", "./demos/afl-demo/aflbuild/afldemo",'', '')
+fuzz = Fuzzer("AFL", "" , "", "./demos/afl-demo/aflbuild/afldemo",'', '')
 #fuzz = Fuzzer("AFL", "" , "", "./demos/afl-demo/aflbuild/afldemo",'', 'relaxed')
-#print(fuzz.deploy_string)
+print(fuzz.deploy_string)

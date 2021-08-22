@@ -1,0 +1,117 @@
+{
+    "id":"fuzzer",
+    "parameters":[
+       {
+          "id":"fuzzertype",
+          "type":"string",
+          "config":{
+             "schema":"properties",
+             "path":[
+                "--fuzzer",
+                "-f"
+             ]
+          },
+          "description":"Fuzzer to be used by the Fuzzing agent",
+          "example":"AFL"
+       },
+       {
+          "id":"inputdir",
+          "type":"string",
+          "config":{
+             "schema":"properties",
+             "path":[
+                "--input",
+                "-i"
+             ]
+          },
+          "description":"Testcases directory to be populated at runtime",
+          "example":"/path/to/testcases/dir"
+       },
+       {
+          "id":"outputdir",
+          "type":"string",
+          "config":{
+             "schema":"properties",
+             "path":[
+                "--output",
+                "-o"
+             ]
+          },
+          "description":"Working output directory for the fuzzer",
+          "example":"/path/to/working/dir"
+       },
+       {
+          "id":"binary",
+          "type":"string",
+          "config":{
+             "schema":"properties",
+             "path":[
+                "--binary",
+                "-b"
+             ]
+          },
+          "description":"The path to the binary of the VF instance to be fuzzed",
+          "example":"/bin/ps"
+       },
+       {
+          "id":"config",
+          "type":"string",
+          "config":{
+             "schema":"properties",
+             "path":[
+                "--config",
+                "-c"
+             ]
+          },
+          "description":"Path to the configuration file for the agent",
+          "example":"/path/to/the/config/fuzzing.cfg"
+       },
+       {
+          "id":"profile",
+          "type":"string",
+          "config":{
+             "schema":"properties",
+             "path":[
+                "--profile",
+                "-p"
+             ]
+          },
+          "description":"Profile for the fuzzing agent",
+          "example":"strict"
+       }
+    ],
+    "actions":[
+       {
+          "id":"deploy",
+          "status":"Fuzzing agent has been deployed.",
+          "config":{
+             "cmd":"python agent.py deploy"
+          },
+          "description":"To deploy a fuzzing agent with the given parameters"
+       },
+       {
+          "id":"pause",
+          "status":"Fuzzing agent has been paused",
+          "config":{
+             "cmd":"python agent.py pause"
+          },
+          "description":"To pause the fuzzing agent and load new inputs."
+       },
+       {
+          "id":"resume",
+          "status":"Fuzzing agent has been resumed",
+          "config":{
+             "cmd":"python agent.py resume"
+          },
+          "description":"To resume the fuzzing agent and work on the new inputs."
+       },
+       {
+          "id":"kill",
+          "status":"Fuzzing agent has been killed",
+          "config":{
+             "cmd":"python agent.py kill"
+          },
+          "description":"To kill the fuzzing agent."
+       }
+    ]
+ }

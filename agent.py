@@ -1,18 +1,20 @@
 import fuzzer
+import flask
 from flask import Flask
 from flask import request, jsonify
-from time import sleep
-from json import dumps
 from kafka import KafkaProducer
 import os
+import sys
+import json
 import os.path as path
 import subprocess
-import json
 import warnings
 import datetime
 import signal
 import argparse
-
+from time import sleep
+from json import dumps
+from multiprocessing import Process, Value
 
 '''
 Fuzzer instance class
@@ -20,6 +22,22 @@ Fuzzer instance class
 fuzz_instance = ""
 crash_list = ""
 queue_list = ""
+
+with open("config/agent.cfg" , "r") as infile :
+     config_data = json.load(infile)
+
+app = flask.Flask(__name__)
+app.config["DEBUG"] = config_data['debug']
+
+process_state = Value('b', True)
+
+def output_data(data, topic) :
+    if config_data['debug'] :
+        print(data)
+    else :
+        ip = config_data["ip"]
+        producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
+        producer.send(topic, value=data)
 
 '''
     Builds the fuzzing instance class and the deploy string for the subprocess
@@ -37,7 +55,15 @@ def deploy(fuzzer):
     Creates a new test case file with the given input for the fuzzing
 '''
 
-def add_testcase(testcase) :
+'''
+TODO : 
+# finish api integration
+# running flask and queuing params together
+'''
+
+@app.route('/add_testcase', methods=['GET'])
+def add_testcase() :
+    testcase = request.args.get('file')
     global fuzz_instance
     file_name = int(max(os.listdir(fuzz_instance.testing_dir)))
     if not file_name :
@@ -46,6 +72,41 @@ def add_testcase(testcase) :
     f = open(fuzz_instance.testing_dir + "/" + str(file_name), "w")
     f.write(testcase)
     f.close()
+    return "Testcase added."
+
+@app.route('/kill', methods=['GET'])
+def kill():
+    global fuzz_instance
+    global p
+    stat = json.loads(stats(fuzz_instance, ""))
+    for each in stat :
+        pid = int(each["fuzzer_pid"])
+        os.kill(pid, signal.SIGKILL)
+    p.terminate()
+    os.kill(os.getpid(), signal.SIGTERM)
+    return "Fuzzer killed."
+
+@app.route('/pause', methods=['GET'])
+def pause():
+    global fuzz_instance
+    global process_state
+    stat = json.loads(stats(fuzz_instance, ""))
+    for each in stat :
+        pid = int(each["fuzzer_pid"])
+        os.kill(pid, signal.SIGSTOP)
+    process_state.value = False
+    return "Fuzzer paused."
+
+@app.route('/resume', methods=['GET'])
+def resume():
+    global fuzz_instance
+    global process_state
+    stat = json.loads(stats(fuzz_instance, ""))
+    for each in stat :
+        pid = int(each["fuzzer_pid"])
+        os.kill(pid, signal.SIGCONT)
+    process_state.value = True
+    return "Fuzzer resumed."
 
 '''
     Provides a json formatted output of fuzzing stats of all the fuzzers deployed. Detailed
@@ -119,39 +180,19 @@ def queues(fuzzer) :
     queue_list = queues
     return json.dumps(queues, indent=4, sort_keys=True)
 
-def kill(fuzzer):
-    stat = json.loads(stats(fuzzer, ""))
-    for each in stat :
-        pid = int(each["fuzzer_pid"])
-        os.kill(pid, signal.SIGKILL)
-
-def pause(fuzzer):
-    stat = json.loads(stats(fuzzer, ""))
-    for each in stat :
-        pid = int(each["fuzzer_pid"])
-        os.kill(pid, signal.SIGSTOP)
-
-def resume(fuzzer):
-    stat = json.loads(stats(fuzzer, ""))
-    for each in stat :
-        pid = int(each["fuzzer_pid"])
-        os.kill(pid, signal.SIGCONT)
-
-def push_report(ip, topic):
+def push_report():
     global fuzz_instance
-    producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
     data = stats(fuzz_instance, "")
-    producer.send(topic, value=data)
+    output_data(data, config_data["topics"]["report"])
 
-def push_compressed_report(ip, topic):
+def push_compressed_report():
     dataset = ["last_crash", "last_path", "last_update", "start_time", "execs_per_sec", 
                 "unique_crashes", "unique_hangs", "execs_done", "paths_favored", "paths_total"]
     global fuzz_instance
-    producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
     data = stats(fuzz_instance, dataset)
-    producer.send(topic, value=data)
+    output_data(data, config_data["topics"]["comp_report"])
 
-def push_queue(ip, topic):
+def push_queue():
     global queue_list, fuzz_instance
     if not queue_list :
         data = queues(fuzz_instance)
@@ -162,12 +203,10 @@ def push_queue(ip, topic):
         for id, value in enumerate(old_data):
             diff = [i for i in new_data[id] + value if i not in new_data[id] or i not in value]
         data = json.dumps(diff, indent=4, sort_keys=True)
-    print(data)
-    #if data :
-    #    producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
-    #    producer.send(topic, value=data)
-
-def push_crashes(ip, topic):
+    if data :
+        output_data(data, config_data["topics"]["queue"])
+    
+def push_crashes():
     global crash_list, fuzz_instance
     if not crash_list :
         data = crashes(fuzz_instance)
@@ -178,12 +217,10 @@ def push_crashes(ip, topic):
         for id, value in enumerate(old_data):
             diff = [i for i in new_data[id] + value if i not in new_data[id] or i not in value]
         data = json.dumps(diff, indent=4, sort_keys=True)
-    print(data)
-    #if data :
-    #    producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
-    #    producer.send(topic, value=data)
+    if data :
+        output_data(data, config_data["topics"]["crash"])
 
-def push_testcase(ip, topic):
+def push_testcase():
     global fuzz_instance
     path = fuzz_instance.testing_dir
     testcases = []
@@ -199,18 +236,19 @@ def push_testcase(ip, topic):
             dir_testcase["content"] = f.read()
             testcases.append(dir_testcase)
         data = json.dumps(testcases, indent=4, sort_keys=True)
-    print(data)
-    #if data :
-    #    producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
-    #    producer.send(topic, value=data)
+    if data :
+        output_data(data, config_data["topics"]["testcase"])
 
-
-'''
-TODO : 
-    # How to call these functions ?
-    # Interface to call the kafka production 
-    # How to integrate the test cases ?
-'''
+def push_global() :
+    global process_state
+    while True:
+        if process_state.value :
+            # push_report()
+            push_compressed_report()
+            # push_queue()
+            # push_crashes()
+            # push_testcase()
+            sleep(config_data["timeout"])
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fuzzing agent for ASTRID")
@@ -220,19 +258,14 @@ if __name__ == "__main__":
     parser.add_argument('--binary', '-b', help='The binary to be used for fuzzing', required=True)
     parser.add_argument('--config', '-c' ,help='Path to the configuration file')
     parser.add_argument('--profile', '-p',help='Execution profile for the agent', required=True)
-    parser.add_argument('--ip', help='IP for the Kafka bus', required=True)
-    parser.add_argument('-topics','-t', nargs='+', help='Topics for the kafka bus [report, comp_report, queue, crash, testcase]', required=True)
     args = parser.parse_args()
     
-    #fuzz = Fuzzer("AFL", "./demos/afl-demo/testcases" , "./demos/afl-demo/findings", "./demos/afl-demo/aflbuild/afldemo",'', '')
     deploy_string(args.fuzzer, args.input, args.output, args.binary, args.config, args.profile)
+    print(fuzz_instance.deploy_string)
     deploy(fuzz_instance)
-    ip = args.ip
-    topic = args.topics
-    while True:
-        push_report(ip, topic[0])
-        push_compressed_report(ip, topic[1])
-        push_queue(ip, topic[2])
-        push_crashes(ip, topic[3])
-        push_testcase(ip, topic[4])
-        sleep(10)
+
+    p = Process(target = push_global)
+    p.start()
+    app.run(use_reloader=False)
+    p.join()
+

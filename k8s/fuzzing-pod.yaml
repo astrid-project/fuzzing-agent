@@ -10,18 +10,30 @@ spec:
   - name: service-with-fuzzing-agent
     image: registry.nestybox.com/nestybox/ubuntu-focal-systemd-docker
     command: ["/sbin/init"]
+    env:
+    - name: BINARY_PATH
+      value: './pcap/afldemo'
+    - name: KAFKA_ENDPOINT
+      value: '127.0.0.1:9092'
+    - name: FLASK_PORT
+      value: '5000'
+    - name: SERVICE_TIMEOUT
+      value: '10'
+    - name: FUZZING_AGENT_DEBUG
+      value: 'true'
     lifecycle:
       postStart:
         exec:
           command: ["/bin/bash", "-c", "sleep 30;\
+                                      echo $(BINARY_PATH); \
                                       docker run --network host \
                                       --name runtime_fuzzer
                                       -dit -v /fuzzing:/agent/pcap:rw \
-                                      -e BINARY_PATH='./pcap/afldemo' \
-                                      -e KAFKA_ENDPOINT='127.0.0.1:9092' \
-                                      -e FLASK_PORT='5000' \
-                                      -e SERVICE_TIMEOUT='10' \
-                                      -e FUZZING_AGENT_DEBUG='true' \
+                                      -e BINARY_PATH=${BINARY_PATH} \
+                                      -e KAFKA_ENDPOINT=${KAFKA_ENDPOINT} \
+                                      -e FLASK_PORT=${FLASK_PORT} \
+                                      -e SERVICE_TIMEOUT=${SERVICE_TIMEOUT} \
+                                      -e FUZZING_AGENT_DEBUG=${FUZZING_AGENT_DEBUG} \
                                       spockuto/astrid-fuzzing-agent:latest"]
     volumeMounts:
     - name: fuzzing

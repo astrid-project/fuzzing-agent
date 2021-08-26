@@ -1,4 +1,7 @@
+from parser import parse_instance
+import kafka
 import fuzzer
+import parser
 import flask
 from flask import Flask
 from flask import request, jsonify
@@ -11,6 +14,7 @@ import subprocess
 import warnings
 import datetime
 import signal
+from distutils import util
 import argparse
 from time import sleep
 from json import dumps
@@ -27,15 +31,15 @@ with open("config/agent.cfg" , "r") as infile :
      config_data = json.load(infile)
 
 app = flask.Flask(__name__)
-app.config["DEBUG"] = config_data['debug']
+app.config["DEBUG"] = bool(util.strtobool(os.getenv('FUZZING_AGENT_DEBUG', 'True')))
 
 process_state = Value('b', True)
 
 def output_data(data, topic) :
-    if config_data['debug'] :
+    if bool(util.strtobool(os.getenv('FUZZING_AGENT_DEBUG', 'True'))) :
         print(data)
     else :
-        ip = config_data["ip"]
+        ip = os.getenv('KAFKA_ENDPOINT', '127.0.0.1:9092')
         producer = KafkaProducer(bootstrap_servers=ip,value_serializer=lambda x: dumps(x).encode('utf-8'))
         producer.send(topic, value=data)
 
@@ -55,17 +59,11 @@ def deploy(fuzzer):
     Creates a new test case file with the given input for the fuzzing
 '''
 
-'''
-TODO : 
-# finish api integration
-# running flask and queuing params together
-'''
-
 @app.route('/add_testcase', methods=['GET'])
 def add_testcase() :
     testcase = request.args.get('file')
     global fuzz_instance
-    file_name = int(max(os.listdir(fuzz_instance.testing_dir)))
+    file_name = max([int(each) for each in os.listdir(fuzz_instance.testing_dir)])
     if not file_name :
         file_name = 0
     file_name = file_name + 1
@@ -241,31 +239,37 @@ def push_testcase():
 
 def push_global() :
     global process_state
+    global fuzz_instance
     while True:
         if process_state.value :
-            # push_report()
+            parse_instance(fuzz_instance)
+            push_report()
             push_compressed_report()
-            # push_queue()
-            # push_crashes()
-            # push_testcase()
-            sleep(config_data["timeout"])
+            push_queue()
+            push_crashes()
+            push_testcase()
+            sleep(int(os.getenv('SERVICE_TIMEOUT', 10)))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fuzzing agent for ASTRID")
     parser.add_argument('--fuzzer', '-f', help='Fuzzer to be used for fuzzing (AFL/driller)', required=True)
     parser.add_argument('--input', '-i', help='Testcases directory for input')
     parser.add_argument('--output', '-o', help='Working output directory for input')
-    parser.add_argument('--binary', '-b', help='The binary to be used for fuzzing', required=True)
+    parser.add_argument('--binary', '-b', help='The binary to be used for fuzzing')
     parser.add_argument('--config', '-c' ,help='Path to the configuration file')
     parser.add_argument('--profile', '-p',help='Execution profile for the agent', required=True)
     args = parser.parse_args()
     
+    if not args.binary :
+        args.binary = os.getenv('BINARY_PATH')
+
     deploy_string(args.fuzzer, args.input, args.output, args.binary, args.config, args.profile)
     print(fuzz_instance.deploy_string)
     deploy(fuzz_instance)
 
     p = Process(target = push_global)
     p.start()
-    app.run(use_reloader=False)
+    port = os.getenv('FLASK_PORT', 5000)
+    app.run(host="localhost", port=port, use_reloader=False)
     p.join()
 

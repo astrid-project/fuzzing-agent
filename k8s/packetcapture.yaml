@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: packetcapture
+spec:
+  hostNetwork: true
+  containers:
+  - name: packetcapture
+    image: docker.io/polycubenets/polycube:latest
+    imagePullPolicy: Always
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: fuzzing
+      mountPath: /packetcapture
+    - name: lib-modules
+      mountPath: /lib/modules
+    - name: usr-src
+      mountPath: /usr/src
+    - name: etc-localtime
+      mountPath: /etc/localtime
+    command: ['/bin/bash', '-c']
+    args: ['polycubed --addr=0.0.0.0']
+  volumes:
+  - name: fuzzing
+    persistentVolumeClaim:
+      claimName: task-pv-claim
+  - name: lib-modules
+    hostPath:
+      path: /lib/modules
+  - name: usr-src
+    hostPath:
+      path: /usr/src
+  - name: etc-localtime
+    hostPath:
+      path: /etc/localtime
+  restartPolicy: Never

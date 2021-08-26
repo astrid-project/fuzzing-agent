@@ -3,3 +3,5 @@ dummy/
 test/
 __pycache__/
 demos/
+pcap/
+fuzzing/

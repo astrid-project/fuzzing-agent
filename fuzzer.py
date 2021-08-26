@@ -134,6 +134,5 @@ class Fuzzer :
             self.set_args("timeout", self.profile["timeout"])
 
 #fuzz = Fuzzer("AFL", "./demos/afl-demo/testcases" , "./demos/afl-demo/findings", "./demos/afl-demo/aflbuild/afldemo",'', '')
-fuzz = Fuzzer("AFL", "" , "", "./demos/afl-demo/aflbuild/afldemo",'', '')
+#fuzz = Fuzzer("AFL", "" , "", "./demos/afl-demo/aflbuild/afldemo",'', '')
 #fuzz = Fuzzer("AFL", "" , "", "./demos/afl-demo/aflbuild/afldemo",'', 'relaxed')
-print(fuzz.deploy_string)

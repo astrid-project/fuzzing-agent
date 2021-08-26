@@ -15,32 +15,6 @@
           "example":"AFL"
        },
        {
-          "id":"inputdir",
-          "type":"string",
-          "config":{
-             "schema":"properties",
-             "path":[
-                "--input",
-                "-i"
-             ]
-          },
-          "description":"Testcases directory to be populated at runtime",
-          "example":"/path/to/testcases/dir"
-       },
-       {
-          "id":"outputdir",
-          "type":"string",
-          "config":{
-             "schema":"properties",
-             "path":[
-                "--output",
-                "-o"
-             ]
-          },
-          "description":"Working output directory for the fuzzer",
-          "example":"/path/to/working/dir"
-       },
-       {
           "id":"binary",
           "type":"string",
           "config":{
@@ -52,19 +26,6 @@
           },
           "description":"The path to the binary of the VF instance to be fuzzed",
           "example":"/bin/ps"
-       },
-       {
-          "id":"config",
-          "type":"string",
-          "config":{
-             "schema":"properties",
-             "path":[
-                "--config",
-                "-c"
-             ]
-          },
-          "description":"Path to the configuration file for the agent",
-          "example":"/path/to/the/config/fuzzing.cfg"
        },
        {
           "id":"profile",
@@ -85,7 +46,7 @@
           "id":"deploy",
           "status":"Fuzzing agent has been deployed.",
           "config":{
-             "cmd":"python agent.py deploy"
+             "cmd":"docker exec -d runtime_fuzzer python3 agent.py"
           },
           "description":"To deploy a fuzzing agent with the given parameters"
        },
@@ -93,7 +54,7 @@
           "id":"pause",
           "status":"Fuzzing agent has been paused",
           "config":{
-             "cmd":"python agent.py pause"
+             "cmd":"curl localhost:5000/pause"
           },
           "description":"To pause the fuzzing agent and load new inputs."
        },
@@ -101,7 +62,7 @@
           "id":"resume",
           "status":"Fuzzing agent has been resumed",
           "config":{
-             "cmd":"python agent.py resume"
+             "cmd":"curl localhost:5000/resume"
           },
           "description":"To resume the fuzzing agent and work on the new inputs."
        },
@@ -109,7 +70,7 @@
           "id":"kill",
           "status":"Fuzzing agent has been killed",
           "config":{
-             "cmd":"python agent.py kill"
+             "cmd":"curl localhost:5000/kill"
           },
           "description":"To kill the fuzzing agent."
        }

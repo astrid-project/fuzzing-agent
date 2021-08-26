@@ -9,24 +9,12 @@
              "value":"AFL"
           },
           {
-             "id":"inputdir",
-             "value":"/path/to/testcases"
-          },
-          {
-             "id":"outputdir",
-             "value":"/path/to/workingdir"
-          },
-          {
              "id":"binary",
-             "value":"/path/to/binary"
-          },
-          {
-             "id":"config",
-             "value":"/path/to/config"
+             "value":"</path/to/binary>"
           },
           {
              "id":"profile",
-             "value":"strict"
+             "value":"normal"
           }
        ],
        "actions":[
@@ -37,7 +25,7 @@
              "id":"resume"
           },
           {
-             "id":"puase"
+             "id":"pause"
           },
           {
              "id":"kill"
